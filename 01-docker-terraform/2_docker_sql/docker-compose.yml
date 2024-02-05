@@ -1,0 +1,45 @@
+version: "3.9"
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:15-alpine
+    hostname: postgres
+    restart: on-failure
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=nyc_taxi
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - internal
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    hostname: pgadmin
+    restart: on-failure
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+      - PGADMIN_CONFIG_SERVER_MODE=False
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+    ports:
+      - "8080:80"
+    networks:
+      - internal
+
+volumes:
+  pg_data:
+    name: ingest_pgdata
+  pgadmin_data:
+    name: ingest_pgadmin
+
+networks:
+  internal:
+    name: pg-network
